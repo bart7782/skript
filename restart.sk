@@ -1,0 +1,112 @@
+variables:
+   {restart} = false
+   {timer} = 0
+   {custom} = false
+
+command /restart [<text>] [<number>] [<text>]:
+	description: Restart the server with a cool count down!
+	permission: spigot.command.restart
+	permission message: &3Restart &6» &7You do not have permission to do this command.
+	aliases: reload, rl, rs, bukkit:rl, stop, minecraft:stop minecraft:reload, bukkit:reload
+	trigger:
+		if arg-1 is not set:
+			if {restart} is true:
+				send "§bError: &rThere is already a scheduled restart in progress! You can use /restart cancel to cancel the restart" to player
+				stop
+			set {restart} to true
+			if {custom} is false:
+				set {timer} to 60
+			if {timer} is 0:
+				set {timer} to 60
+			if {timer} is less than 60:
+				set {restarttime} to {timer}
+				set {unit} to "seconds"
+			if {timer} is more than 3539:
+				set {restarttime} to {timer} / 3600
+				set {unit} to "hours"
+			if {timer} is more than 59:
+				if {timer} is less than 3540:
+					set {restarttime} to {timer} / 60
+					set {unit} to "minute(s)"
+			broadcast "&4&lATTENTION &cWe're restarting the server in %{restarttime}% %{unit}%. Please prepare to be disconnected."
+			set {starttime} to {timer}
+			playsound()
+			while {restart} is true:
+				if {timer} is {starttime} / 2:
+					if {timer} is more than 32:
+						if {timer} is less than 60:
+							set {restarttime} to {timer}
+							set {unit} to "second(s)"
+						if {timer} is more than 3539:
+							set {restarttime} to {timer} / 3600
+							set {unit} to "hour(s)"
+						if {timer} is more than 59:
+							if {timer} is less than 3540:
+								set {restarttime} to {timer} / 60
+								set {unit} to "minutes"
+						broadcast "&4&LATTENTION &cThere's a restart due in %{restarttime}% %{unit}%. Prepare to be disconnected!"
+						playsound()
+						set {starttime} to {timer}
+				if {timer} is 30:
+					broadcast "&4&lATTENTION &c30 seconds remaining until the server restarts."
+					playsound()
+				if {timer} is between 10 and 1:
+					broadcast "&4&lATTENTION &c%{timer}% seconds remaining until the server restarts."
+					playsound()
+				if {timer} is 0:
+					broadcast "&4&lATTENTION &cServer is restarting!"
+					wait 1 second
+					if {restart} is true:
+						make console execute "kickall The server is restarting, please wait while it reboots."
+						make console execute "spigot:restart"
+				wait 1 second
+				subtract 1 from {timer}
+			stop
+		if arg-1 is set: 
+			if arg-1 is "instant" or "now":
+				make console execute "kickall The server is restarting, please wait while it reboots."
+				make console execute "spigot:restart"
+			if arg-1 is "cancel":
+				if {restart} is false:
+					send "§bError: &rThere is no scheduled restart in progress!" to player
+					stop
+				set {restart} to false
+				set {custom} to false
+				set {timer} to 0
+				set {restarttime} to "unknown"
+				broadcast "&aRestart has been cancelled"
+				stop
+			if arg-1 is "timer" or "time" or "delay":
+				if arg-2 is set:
+					set {_number} to arg-2
+					set {_unit} to arg-3
+					if {_unit} is "s" or "seconds" or "second":
+						set {_seconds} to {_number}
+						set {unit} to "seconds"
+					else if {_unit} is "m" or "minutes" or "minute":
+						set {_seconds} to {_number} * 60
+						set {unit} to "minutes"
+					else if {_unit} is "h" or "hours" or "hour":
+						set {_seconds} to {_number} * 3600
+						set {unit} to "hours"
+					else:
+						send "§bError: Please provide the restart delay in seconds, minutes, or hours (e.g. /restart timer 5 m)" to player
+						stop
+					set {timer} to {_seconds}
+					set {custom} to true
+					make player execute command "/restart"
+					set {custom} to false
+					stop
+				else: 
+					send "§bError: Please provide the restart delay in seconds, minutes, or hours (e.g. /restart timer 5 m)" to player
+					stop
+			else:
+				send "§bError: &rValid commands are '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
+				stop
+		else:
+			send "§bError: &rValid commands are '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
+
+
+function playsound():
+	loop all players:
+		play sound "BLOCK_NOTE_BLOCK_PLING" to loop-player
