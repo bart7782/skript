@@ -1,3 +1,8 @@
+# Made by bart7782
+# Website: https://bart7782.nl
+# Skript source: https://github.com/bart7782/skript
+# Based on: https://www.spigotmc.org/resources/restart-skript.59180/
+
 variables:
    {restart} = false
    {timer} = 0
@@ -29,6 +34,7 @@ command /restart [<text>] [<number>] [<text>]:
 					set {restarttime} to {timer} / 60
 					set {unit} to "minute(s)"
 			broadcast "&4&lATTENTION &cWe're restarting the server in %{restarttime}% %{unit}%. Please prepare to be disconnected."
+			send "Server will restart in %{restarttime}% %{unit}%" to console
 			set {starttime} to {timer}
 			playsound()
 			while {restart} is true:
@@ -45,16 +51,20 @@ command /restart [<text>] [<number>] [<text>]:
 								set {restarttime} to {timer} / 60
 								set {unit} to "minutes"
 						broadcast "&4&LATTENTION &cThere's a restart due in %{restarttime}% %{unit}%. Prepare to be disconnected!"
+						send "Server will restart in %{restarttime}% %{unit}%" to console
 						playsound()
 						set {starttime} to {timer}
 				if {timer} is 30:
 					broadcast "&4&lATTENTION &c30 seconds remaining until the server restarts."
+					send "Server will restart in 30 seconds" to console
 					playsound()
 				if {timer} is between 10 and 1:
 					broadcast "&4&lATTENTION &c%{timer}% seconds remaining until the server restarts."
+					send "Server will restart in %{timer}% seconds" to console
 					playsound()
 				if {timer} is 0:
 					broadcast "&4&lATTENTION &cServer is restarting!"
+					send "Server is restarting!" to console
 					wait 1 second
 					if {restart} is true:
 						make console execute "kickall The server is restarting, please wait while it reboots."
@@ -100,6 +110,18 @@ command /restart [<text>] [<number>] [<text>]:
 				else: 
 					send "§bError: Please provide the restart delay in seconds, minutes, or hours (e.g. /restart timer 5 m)" to player
 					stop
+			if arg-1 is "help" or "?":
+				send "Possible commands are:" to player
+				send "/restart now - Restart the server immediately" to player
+				send "/restart timer <number> <unit> - Restart the server after a specified amount of time" to player
+				send "/restart cancel - Cancel a scheduled restart" to player
+				send "/restart help - Display this help message" to player
+				send "" to player
+				send "/restart now/instant" to player
+				send "/restart timer/delay/time" to player
+				send "/restart help/?" to player
+
+			
 			else:
 				send "§bError: &rValid commands are '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
 				stop
