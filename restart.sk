@@ -123,7 +123,7 @@ command /restart [<text>] [<number>] [<text>]:
 				send "&7/restart timer/delay/time" to player
 				send "&7/restart help/?" to player
 			else:
-				send "§bError: &rValid commands are '/help' '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
+				send "§bError: &rValid commands are '/restart help' '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
 				stop
 		else:
 			send "§bError: &rValid commands are '/restart help', '/restart', '/restart now', '/restart timer', and '/restart cancel'" to player
